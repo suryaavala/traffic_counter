@@ -1,0 +1,21 @@
+# Stage 1: Builder
+FROM ghcr.io/astral-sh/uv:latest AS builder
+ENV UV_PROJECT_ENVIRONMENT=/opt/venv
+WORKDIR /app
+COPY uv.lock pyproject.toml ./
+RUN uv sync --frozen --no-dev
+
+# Stage 2: Runtime
+FROM python:3.11-slim-bookworm
+RUN apt-get update && apt-get install -y --no-install-recommends dumb-init && rm -rf /var/lib/apt/lists/*
+RUN useradd -m -u 1000 appuser
+
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+WORKDIR /app
+COPY src/ ./src/
+
+USER appuser
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+CMD ["python", "-m", "src.main"]
