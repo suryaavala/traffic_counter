@@ -1,0 +1,30 @@
+[project]
+name = "traffic-counter"
+version = "0.1.0"
+description = "traffic counter for SEEK!"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+]
+
+[dependency-groups]
+dev = [
+    "mypy",
+    "pre-commit",
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+    "ruff",
+]
+
+[tool.mypy]
+strict = true
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.pytest.ini_options]
+addopts = "--cov=src --cov-fail-under=85"
