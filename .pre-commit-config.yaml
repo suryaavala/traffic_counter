@@ -1,21 +1,9 @@
 repos:
   - repo: local
     hooks:
-      - id: format
-        name: format
-        entry: make format
-        language: system
-        types: [python]
-        pass_filenames: false
-      - id: lint
-        name: lint
-        entry: make lint
-        language: system
-        types: [python]
-        pass_filenames: false
-      - id: typecheck
-        name: typecheck
-        entry: make typecheck
+      - id: ci
+        name: ci
+        entry: make ci
         language: system
         types: [python]
         pass_filenames: false
