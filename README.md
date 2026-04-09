@@ -34,7 +34,13 @@
 ### choices
 
 - making the choice of processing row by row instead of heapify, etc.. on the whole data.
-
+- hand crafted:
+  - solution except for autocomplete here and there
+- use of AI:
+  - analysis/review of the solution
+  - write docs (docstrings, README)
+  - setup tests
+  - bootstrap repo
 
 
 ### Dev
