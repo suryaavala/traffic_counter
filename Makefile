@@ -1,25 +1,16 @@
-.PHONY: setup format lint typecheck test test-fast ci docker-build
+.PHONY: setup format lint typecheck test ci
 
 setup:
 	uv sync
 
-format:
-	uv run ruff format src tests
-	uv run ruff check --fix src tests
-
 lint:
-	uv run ruff check src tests
+	uv run ruff format . --exclude test*
+	uv run ruff check --fix . --exclude test*
 
 typecheck:
-	uv run mypy src tests
+	uv run mypy . --exclude test*
 
 test:
 	uv run pytest --cov=src --cov-fail-under=85
 
-test-fast:
-	uv run pytest tests/ -m "not slow"
-
-ci: lint typecheck test-fast
-
-docker-build:
-	docker build -f docker/Dockerfile.base -t traffic_counter:latest .
+ci: lint typecheck test
