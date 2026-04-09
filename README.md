@@ -23,7 +23,7 @@
 3. `top_3_half_hours`: list of `(datetime, count)` tuples representing the top 3 half hours with the highest vehicle counts
    * not necessarily consecutive
    * sorted by count in descending order
-   * if there are ties, the earlier half hour is preferred (assuming the input data is already sorted by timestamp in chronological order)
+   * if there are ties, the earlier half hour is preferred
    * if less than 3 half hours are present, return all
 4. `least_hour_and_half`: list of `(datetime, count)` tuples representing the least hour and half with the lowest vehicle counts
    * contiguous half hours

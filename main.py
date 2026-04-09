@@ -12,18 +12,24 @@ from datetime import date, datetime, timedelta
 from typing import Iterator
 
 
-@dataclass(order=True)
+@dataclass
 class HalfHour:
     """Represents a single 30-minute interval and its logged vehicle count.
 
     Attributes:
         count (int): The quantity of vehicles observed.
-        timestamp (datetime): The starting ISO-8601 timestamp of the interval. Excluded from
-            logical comparisons, ensuring ordering is evaluated strictly by count.
+        timestamp (datetime): The starting ISO-8601 timestamp of the interval.
     """
 
     count: int
-    timestamp: datetime = field(compare=False)
+    timestamp: datetime
+
+    def __lt__(self, other: "HalfHour") -> bool:
+        if self.count != other.count:
+            return self.count < other.count
+        # Min-Heap tie-breaker: to PREFER earlier timestamps (keep them safe), we must
+        # eject later timestamps. Thus, later timestamps must evaluate as "less than".
+        return self.timestamp > other.timestamp
 
 
 @dataclass
