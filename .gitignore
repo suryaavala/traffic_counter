@@ -1,1 +1,5 @@
 .uv_cache
+*cache*
+.coverage
+.venv
+__pycache__
