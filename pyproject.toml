@@ -27,4 +27,4 @@ line-length = 120
 convention = "google"
 
 [tool.pytest.ini_options]
-addopts = "--cov=main --cov-fail-under=85"
+addopts = "--cov=main --cov-fail-under=85 --cov-report=term-missing"
