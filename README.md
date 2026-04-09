@@ -1,6 +1,6 @@
 ### Assumptions
 
-1. data is given in a `csv` file with two `unnamed` columns representing `timestamp` and `count` respectively; and the file is clean
+1. data is given in a `csv` file with two `unnamed` columns representing `timestamp` and `count`, respectively, separated by whitespace as delimiter and the file is clean
    * data is sorted by `timestamp`, but not contiguous
    * `timestamp` is in `YYYY-MM-DDTHH:MM:SS` ISO 8601 format
    * `count` is an integer
@@ -19,11 +19,11 @@
 - empty file will still print the explanatory strings but with empty data
 
 1. `total_vehicles`: total number of vehicles
-2. `daily`: list of `Day` objects with `date` and `total_vehicles`
+2. `daily`: list of tuples with `date` string in ISO 8601 format and `total_vehicles` pairs
 3. `top_3_half_hours`: list of `(datetime, count)` tuples representing the top 3 half hours with the highest vehicle counts
    * not necessarily consecutive
    * sorted by count in descending order
-   * if there are ties, the earlier half hour is preferred
+   * if there are ties, the earlier half hour is preferred (assuming the input data is already sorted by timestamp in chronological order)
    * if less than 3 half hours are present, return all
 4. `least_hour_and_half`: list of `(datetime, count)` tuples representing the least hour and half with the lowest vehicle counts
    * contiguous half hours
