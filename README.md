@@ -29,6 +29,8 @@ This solution abandons naive array-buffering (`O(N)` memory) in favor of a stric
 * **Implementation:** A sliding array constraint resetting upon `timedelta != 30`.
 * **Complexity:** Operates inline at **$O(1)$** spatial and **$O(N)$** temporal complexity perfectly tracking the 3-block contiguity rules.
 
+> 📊 **Deep Dive:** Read the full [L7 Architecture Review](./docs/ARCHITECTURE.md) for exhaustive Big-O profiling and internal validation mechanics.
+
 ---
 
 ## 📜 Assumptions & Data Contracts
