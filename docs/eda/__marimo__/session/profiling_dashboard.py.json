@@ -1,0 +1,80 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.23.0",
+    "script_metadata_hash": null
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "0fb9465373c2d7a900820aca29aa98cf",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "10e332909063611998137ba5f5753791",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "0760b743a4d8b6e143fb3b90c0f580a2",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "abbfca255e393715a64901e93d79e088",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "795a963cb5c24ea82ac5bcc5262f979a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"architectural-benchmark-fti-pipeline-mitigations\">\ud83c\udfce\ufe0f Architectural Benchmark: FTI Pipeline Mitigations</h1>\n<span class=\"paragraph\">This reactive dashboard visualizes the specific performance deltas gathered by separating <code>Metrics</code> into an explicit <code>OptimizedMetrics</code> architecture inside <code>main.py</code> using <strong>only the Python 3.x Standard Library.</strong></span></span><marimo-ui-element object-id='lEQa-0' random-id='1c609ef8-e03e-b11c-a37d-0df009670216'><marimo-vega data-initial-value='{}' data-label='null' data-spec='{&quot;config&quot;:{&quot;view&quot;:{&quot;continuousWidth&quot;:300,&quot;continuousHeight&quot;:300}},&quot;data&quot;:{&quot;url&quot;:&quot;./@file/5123-12315360-OxRuX8Yc.arrow&quot;,&quot;format&quot;:{&quot;type&quot;:&quot;arrow&quot;}},&quot;mark&quot;:{&quot;type&quot;:&quot;bar&quot;},&quot;encoding&quot;:{&quot;color&quot;:{&quot;field&quot;:&quot;Variant&quot;,&quot;type&quot;:&quot;nominal&quot;},&quot;row&quot;:{&quot;field&quot;:&quot;Variant&quot;,&quot;title&quot;:&quot;&quot;,&quot;type&quot;:&quot;nominal&quot;},&quot;x&quot;:{&quot;field&quot;:&quot;CumulativeTime&quot;,&quot;title&quot;:&quot;Cumulative Time (s)&quot;,&quot;type&quot;:&quot;quantitative&quot;},&quot;y&quot;:{&quot;field&quot;:&quot;Function&quot;,&quot;sort&quot;:&quot;-x&quot;,&quot;title&quot;:&quot;Function&quot;,&quot;type&quot;:&quot;nominal&quot;}},&quot;height&quot;:200,&quot;resolve&quot;:{&quot;scale&quot;:{&quot;y&quot;:&quot;independent&quot;}},&quot;title&quot;:&quot;Comparison: Top 15 Expensive Calls (Baseline vs Optimized StdLib)&quot;,&quot;width&quot;:600,&quot;&#36;schema&quot;:&quot;https://vega.github.io/schema/vega-lite/v6.1.0.json&quot;}' data-chart-selection='true' data-field-selection='true' data-embed-options='{}'></marimo-vega></marimo-ui-element><span class=\"markdown prose dark:prose-invert contents\"><hr /></span><div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"1-architectural-mitigations-legacy-vs-optimized\">1. Architectural Mitigations (Legacy vs Optimized)</h2></span><marimo-callout-output data-html='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;h3 id=&#92;&quot;memory-gc-thrashing-eliminated-space-complexity-downarrow&#92;&quot;&gt;\ud83d\udd34 Memory GC Thrashing Eliminated (Space Complexity &lt;marimo-tex class=&#92;&quot;arithmatex&#92;&quot;&gt;||(&#92;&#92;Downarrow||)&lt;/marimo-tex&gt;)&lt;/h3&gt;&#92;n&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;The baseline spawned a heavy &lt;code&gt;HalfHour(count, timestamp)&lt;/code&gt; Python dataclass per row. Over 500k rows, the Python allocator and garbage collector was forced to initialize and natively track half a million heavy Python structs with explicit &lt;code&gt;__dict__&lt;/code&gt; bindings.&lt;/span&gt;&#92;n&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;&lt;strong&gt;Fix:&lt;/strong&gt; Replaced explicit dataclass allocations entirely with strictly bound native primitive tuples &lt;code&gt;(count, timestamp)&lt;/code&gt; bypassing implicit object instantiation loops.&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;danger&quot;'></marimo-callout-output><marimo-callout-output data-html='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;h3 id=&#92;&quot;contiguous-c-memory-heap-execution-time-complexity-downarrow&#92;&quot;&gt;\u26a0\ufe0f Contiguous C-Memory Heap Execution (Time Complexity &lt;marimo-tex class=&#92;&quot;arithmatex&#92;&quot;&gt;||(&#92;&#92;Downarrow||)&lt;/marimo-tex&gt;)&lt;/h3&gt;&#92;n&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;The legacy logic forced &lt;code&gt;heapq&lt;/code&gt; (a highly optimized C-compiled pipeline bounds) to fall back entirely into the Python interpreter loop evaluating a custom &lt;code&gt;__lt__&lt;/code&gt; (Less Than) dunder method across millions of priority swap resolutions.&lt;/span&gt;&#92;n&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;&lt;strong&gt;Fix:&lt;/strong&gt; Eliminated the dunder methods entirely by leveraging float inversion to sort chronological dates mathematically: &lt;code&gt;(count, -timestamp.timestamp())&lt;/code&gt;. The C-layer inherently calculates nested tuple indices seamlessly in contiguous memory.&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;warn&quot;'></marimo-callout-output><marimo-callout-output data-html='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;h3 id=&#92;&quot;true-mathcalo1-native-ring-buffers&#92;&quot;&gt;\u2705 True &lt;marimo-tex class=&#92;&quot;arithmatex&#92;&quot;&gt;||(&#92;&#92;mathcal{O}(1)||)&lt;/marimo-tex&gt; Native Ring Buffers&lt;/h3&gt;&#92;n&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;Tracking contiguous 1.5-hour sequence blocks natively relied on Python array indexing via &lt;code&gt;list.pop(0)&lt;/code&gt;. Because dynamic arrays map to contiguous block spaces, slicing the leading index forces the interpreter to explicitly move all trailing variables sequentially left. &lt;/span&gt;&#92;n&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;&lt;strong&gt;Fix:&lt;/strong&gt; Exchanged standard sequences natively with &lt;code&gt;collections.deque(maxlen=3)&lt;/code&gt;. Built as a linked-list implementation, hitting maximum limits organically terminates the tail-pointer reference in strict &lt;marimo-tex class=&#92;&quot;arithmatex&#92;&quot;&gt;||(&#92;&#92;mathcal{O}(1)||)&lt;/marimo-tex&gt; complexity.&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;success&quot;'></marimo-callout-output><span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"2-big-o-algorithmic-matrix-external-trajectory\">2. Big-O Algorithmic Matrix &amp; External Trajectory</h2>\n<table>\n<thead>\n<tr>\n<th>Metric / Constraint</th>\n<th>Baseline (<code>Metrics</code>)</th>\n<th>StdLib (<code>OptimizedMetrics</code>)</th>\n<th>External Polars (Rust / Arrow)</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><strong>Contiguous Storage</strong></td>\n<td><marimo-tex class=\"arithmatex\">||(\\mathcal{O}(M)||)</marimo-tex> (List Shift / <code>pop(0)</code>)</td>\n<td><marimo-tex class=\"arithmatex\">||(\\mathcal{O}(1)||)</marimo-tex> (<code>deque</code> Ring Buffer)</td>\n<td><marimo-tex class=\"arithmatex\">||(\\mathcal{O}(1)||)</marimo-tex> (Fast Agg Rolling)</td>\n</tr>\n<tr>\n<td><strong>Top K Peak Filter</strong></td>\n<td><marimo-tex class=\"arithmatex\">||(\\mathcal{O}(\\log k)||)</marimo-tex> + Python Thread Block</td>\n<td><marimo-tex class=\"arithmatex\">||(\\mathcal{O}(\\log k)||)</marimo-tex> Native C Layer</td>\n<td>Vectorized Multi-Threaded Arrays</td>\n</tr>\n<tr>\n<td><strong>Memory GC Payload</strong></td>\n<td><strong>Massive</strong> (<code>dataclass</code> GC tracks)</td>\n<td><strong>Minimal</strong> (Primitive variables)</td>\n<td><strong>Complete Offload</strong> (Zero-copy memory)</td>\n</tr>\n</tbody>\n</table>\n<h3 id=\"theoretical-external-scaling-vector\">Theoretical External Scaling Vector</h3>\n<span class=\"paragraph\">This notebook independently executes a simulation via <code>pl.scan_csv()</code> utilizing uninhibited multi-threaded Rust execution to definitively benchmark what external dependencies can achieve:</span></span></div><span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>Polars Execution Time (Read + Parse 500k rows):</strong> <code>0.0878s</code> (Raw C++ Multithreading)</span></span></div>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    }
+  ]
+}

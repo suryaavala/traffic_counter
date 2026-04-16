@@ -1,0 +1,74 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.23.0",
+    "script_metadata_hash": null
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "e9abbdb933fcbaa774ce81bf44f46a4d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "b15f52e159bd527f963010be965bcf63",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"python-native-scaling-visualizing-core-bottlenecks\">\ud83c\udfce\ufe0f Python Native Scaling: Visualizing Core Bottlenecks</h1>\n<span class=\"paragraph\">This interactive notebook directly demonstrates the underlying hardware execution bounds governing pristine Python architectures:</span>\n<ol>\n<li><strong>Array Memory Shifting</strong> (<code>list.pop</code> vs <code>collections.deque</code>)</li>\n<li><strong>Garbage Collection Thrashing</strong> (<code>dataclass</code> vs Primitives)</li>\n<li><strong>C-Extension Boundaries</strong> (Custom context dunders vs Native C-bindings)</li>\n</ol></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "d32e4bc017febce21ba23d9b14c6e727",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "48e75c8f226280315e800790683ffa11",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"1-dynamic-array-shifting-vs-linked-lists\">1. Dynamic Array Shifting vs Linked Lists</h2>\n<span class=\"paragraph\">Adjust the slider to simulate tracking contiguous architectures logically shifting memory nodes during streaming limits:</span>\n<span class=\"paragraph\"><marimo-ui-element object-id='vblA-0' random-id='a2a46689-6352-eb2d-fc93-7a6f203824c5'><marimo-slider data-initial-value='500000' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;Simulation Processing Matrix (N Actions): &lt;/span&gt;&lt;/span&gt;&quot;' data-start='100000' data-stop='2000000' data-step='100000' data-steps='[]' data-debounce='false' data-disabled='false' data-orientation='&quot;horizontal&quot;' data-show-value='false' data-include-input='false' data-full-width='false'></marimo-slider></marimo-ui-element></span>\n<span class=\"paragraph\"><strong><code>list.pop(0)</code> Execution (Contiguous Sequence Left Shift <marimo-tex class=\"arithmatex\">||(\\mathcal{O}(M)||)</marimo-tex>)</strong></span>\n<ul>\n<li>Time: <code>0.14887s</code> \ud83d\udd34 (Degrades exponentially as internal arrays scale due to forced memory realignment)</li>\n</ul>\n<span class=\"paragraph\"><strong><code>collections.deque(maxlen=3)</code> (Ring Buffer Tail Truncation <marimo-tex class=\"arithmatex\">||(\\mathcal{O}(1)||)</marimo-tex>)</strong></span>\n<ul>\n<li>Time: <code>0.05478s</code> \u2705 (Near-instant execution universally utilizing doubly-linked physical node truncation)</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "9d44291347fe3dc8a49a4fb4136daf15",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><hr />\n<h2 id=\"2-object-instantiation-gc-c-memory-context-boundaries\">2. Object Instantiation GC &amp; C-Memory Context Boundaries</h2>\n<span class=\"paragraph\">Instantiating python classes forces tracking via explicit metadata <code>__dict__</code> bindings across the interpreter Garbage Collector. Native tuples inherently sidestep this GC check perfectly.</span>\n<span class=\"paragraph\">Additionally, executing <code>heapq</code> normally natively anchors priority swaps securely within low-tier <strong>C-Extensions</strong>. But invoking a custom Python <code>__lt__</code> forces the C-compiled module to continuously halt entirely over thousands of loops to call out into the slower Python Interpreter!</span>\n<span class=\"paragraph\">Tracking <code>N=700,000</code> Active Elements:</span>\n<span class=\"paragraph\"><strong>Python Interpreter Yielding (Python Object + <code>__lt__</code>)</strong></span>\n<ul>\n<li>Time: <code>0.46194s</code> \ud83d\udd34 (Yield penalties and GC Tracking severely degrades large ingestion loops)</li>\n</ul>\n<span class=\"paragraph\"><strong>C-Nativization Context Limits (Raw primitives + inherent structs)</strong></span>\n<ul>\n<li>Time: <code>0.16787s</code> \u2705 (Executed efficiently inside low-level C with strict Zero-alloc structures)</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}

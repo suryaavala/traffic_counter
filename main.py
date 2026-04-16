@@ -6,6 +6,9 @@ half-hour peaks (using a Min-Heap constraint), and identifies the 1.5-hour conti
 block with the lowest observed traffic volume.
 """
 
+import sys
+import argparse
+import collections
 import heapq
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
@@ -235,6 +238,88 @@ class Metrics:
         )
 
 
+class OptimizedMetrics:
+    """Stateful aggregator computing rolling analytics using pure stdlib optimisations.
+    
+    Eliminates GC thrashing by evading explicit generic Dataclass usage during tight loops,
+    utilizes collections.deque for O(1) shifting, and avoids Python-context heap evaluation.
+    """
+
+    def __init__(self) -> None:
+        self.total_vehicles: int = 0
+        self._daily: dict[date, int] = {}
+        self._top_3_half_hours: list[tuple[int, float, str]] = []
+        self._last_hour_and_half: collections.deque[tuple[int, datetime, str]] = collections.deque(maxlen=3)
+        self._least_hour_and_half: list[tuple[int, datetime, str]] = []
+
+    @property
+    def daily(self) -> list[tuple[str, int]]:
+        return [(d.isoformat(), c) for d, c in self._daily.items()]
+
+    def _update_daily(self, count: int, half_hour: datetime) -> None:
+        day = half_hour.date()
+        self._daily[day] = self._daily.get(day, 0) + count
+
+    @property
+    def top_3_half_hours(self) -> list[tuple[str, int]]:
+        sorted_top_3 = sorted(self._top_3_half_hours, key=lambda x: x[0], reverse=True)
+        return [(item[2], item[0]) for item in sorted_top_3]
+
+    def _update_top_3_half_hours(self, count: int, timestamp: datetime, iso_str: str) -> None:
+        item = (count, -timestamp.timestamp(), iso_str)
+        if len(self._top_3_half_hours) < 3:
+            heapq.heappush(self._top_3_half_hours, item)
+        else:
+            heapq.heappushpop(self._top_3_half_hours, item)
+
+    @property
+    def last_hour_and_half(self) -> list[tuple[str, int]]:
+        return sorted([(item[2], item[0]) for item in self._last_hour_and_half], key=lambda x: x[0])
+
+    def _update_last_hour_and_half(self, count: int, timestamp: datetime, iso_str: str) -> None:
+        if len(self._last_hour_and_half) > 0:
+            last_timestamp = self._last_hour_and_half[-1][1]
+            if timestamp - last_timestamp != timedelta(minutes=30):
+                self._last_hour_and_half.clear()
+
+        self._last_hour_and_half.append((count, timestamp, iso_str))
+        self._update_least_hour_and_half()
+
+    @property
+    def least_hour_and_half(self) -> list[tuple[str, int]]:
+        return [(item[2], item[0]) for item in self._least_hour_and_half]
+
+    def _update_least_hour_and_half(self) -> None:
+        if len(self._last_hour_and_half) == 3:
+            current_sum = sum(item[0] for item in self._last_hour_and_half)
+            
+            if not self._least_hour_and_half:
+                self._least_hour_and_half = list(self._last_hour_and_half)
+            else:
+                least_sum = sum(item[0] for item in self._least_hour_and_half)
+                if current_sum < least_sum:
+                    self._least_hour_and_half = list(self._last_hour_and_half)
+
+    def parse_half_hour_row(self, row: tuple[datetime, int]) -> None:
+        timestamp, count = row[0], row[1]
+        iso_str = timestamp.isoformat(timespec="seconds")
+        
+        self.total_vehicles += count
+        self._update_daily(count, timestamp)
+        self._update_top_3_half_hours(count, timestamp, iso_str)
+        self._update_last_hour_and_half(count, timestamp, iso_str)
+
+    def __generate_time_string(self, data: list[tuple[str, int]]) -> str:
+        return "\n".join([f"{d} {c}" for d, c in data])
+
+    def __str__(self) -> str:
+        return (
+            f"total cars:\n{self.total_vehicles}\n\n"
+            f"daily cars:\n{self.__generate_time_string(self.daily)}\n\n"
+            f"top 3 half hours:\n{self.__generate_time_string(self.top_3_half_hours)}\n\n"
+            f"least hour and half:\n{self.__generate_time_string(self.least_hour_and_half)}"
+        )
+
 def read_file_data(file_path: str) -> Iterator[tuple[datetime, int]]:
     """Yields parsed half-hour bounds strictly lazily masking disk size constraints.
 
@@ -271,10 +356,40 @@ def calculate_metrics(data: Iterator[tuple[datetime, int]]) -> Metrics:
     return metrics
 
 
+def calculate_metrics_optimized(data: Iterator[tuple[datetime, int]]) -> OptimizedMetrics:
+    """Delegates a raw event stream generator through the explicitly optimized handler."""
+    metrics = OptimizedMetrics()
+    for row in data:
+        metrics.parse_half_hour_row(row)
+    return metrics
+
+
 def main() -> None:
     """Direct orchestration pipeline executing algorithmic tests systematically."""
-    data = read_file_data("input.csv")
-    metrics = calculate_metrics(data)
+    parser = argparse.ArgumentParser(description="Traffic Counter & Profiling Pipeline")
+    parser.add_argument("file_path", nargs="?", default="input.csv", help="Log source path")
+    parser.add_argument("--profile", action="store_true", help="Dumps cumulative cProfile telemetry")
+    parser.add_argument("--optimized", action="store_true", help="Runs standard-library explicit optimized version")
+    args = parser.parse_args()
+
+    profiler = None
+    if args.profile:
+        import cProfile
+        profiler = cProfile.Profile()
+        profiler.enable()
+
+    data = read_file_data(args.file_path)
+    
+    if args.optimized:
+        metrics = calculate_metrics_optimized(data)
+    else:
+        metrics = calculate_metrics(data)
+        
+    if args.profile and profiler:
+        profiler.disable()
+        dump_target = "scratch/optimized.prof" if args.optimized else "scratch/baseline.prof"
+        profiler.dump_stats(dump_target)
+        
     print(metrics)
 
 

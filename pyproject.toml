@@ -9,7 +9,10 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "altair>=6.0.0",
+    "marimo>=0.23.0",
     "mypy",
+    "polars>=1.39.3",
     "pre-commit",
     "pytest",
     "pytest-asyncio",
